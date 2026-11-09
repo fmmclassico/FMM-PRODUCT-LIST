@@ -32,39 +32,40 @@ button:disabled{opacity:.45;cursor:not-allowed}
 @media(max-width:480px){header{padding:20px 16px}.current{grid-template-columns:85px 1fr}.current img{width:85px;height:100px}.field button{width:100%}}
 </style></head>
 <body>
-<header><h1>FMM CLASSICO — Share Products</h1><p>Send products to one customer at a time. Each product opens as its own WhatsApp message with its own product link and preview.</p></header>
+<header><h1>FMM CLASSICO — Share Products</h1><p>Share products through WhatsApp. Choose the customer or group inside WhatsApp; no phone-number entry is needed.</p></header>
 <main>
 <section class="panel">
- <h2>Send all available products to one customer</h2>
- <p class="help">Enter the customer's WhatsApp number, then work through the product queue. Each product is opened separately in WhatsApp so its own picture, name and price preview can load.</p>
- <div class="field"><input id="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="Customer WhatsApp number (e.g. 0241234567 or 233241234567)" aria-label="Customer WhatsApp number"><button id="start">Start sending all products</button></div>
+ <h2>Share available products on WhatsApp</h2>
+ <p class="help">No phone number needed. Tap Start, choose the customer or group inside WhatsApp, send the product, then return here for the next one.</p>
+ <div class="field"><button id="start">Start sharing all products on WhatsApp</button></div>
  <div id="progressWrap" hidden><div class="progress"><span id="progressBar"></span></div><div id="progressText" class="help"></div>
   <div class="current"><img id="currentImage" alt="Current product"><div><div class="current-name" id="currentName"></div><div class="current-price" id="currentPrice"></div><div class="help" id="currentCount"></div></div></div>
   <div class="queue-actions"><button id="openCurrent">Open this product in WhatsApp</button><button id="next" class="secondary">Next product →</button><button id="reset" class="secondary">Start again</button></div>
  </div>
- <div class="warning">WhatsApp does not allow a normal website to silently send 26 messages. This guided queue opens one pre-filled message at a time. You must tap Send in WhatsApp, return here, and choose Next product. The product URL is included so WhatsApp can generate its individual preview; preview display can depend on WhatsApp's link-preview loading and cache.</div>
+ <div class="warning">WhatsApp lets you choose the recipient from its own contact list. This guided queue shares one product at a time: choose the customer or group and tap Send, then return here and tap Next product. You will choose the recipient again for each product. Each message contains its own product link; WhatsApp controls whether its link preview appears.</div>
  <div id="status">Loading available products…</div>
 </section>
-<section class="panel"><h2>Available products</h2><p class="help">You can also share a single product directly from its card.</p><div class="grid" id="products"></div></section>
+<section class="panel"><h2>Available products</h2><p class="help">You can also choose a recipient and share any single product.</p><div class="grid" id="products"></div></section>
 <div class="field"><button class="secondary" id="back">Back to Admin</button><button class="secondary" id="copyLink">Copy Full Catalogue Link</button></div>
 </main>
 <script>
 const SITE='https://products.fmmclassico.com';
 const $=id=>document.getElementById(id);
-let products=[],queue=[],queueIndex=0,recipient='';
+let products=[],queue=[],queueIndex=0;
 function slugify(value){return String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
 function productUrl(p){return SITE+'/'+encodeURIComponent(slugify(p.name))}
 function imageOf(p){return (Array.isArray(p.images)&&p.images[0])||p.image||''}
 function normalizePhone(raw){let n=String(raw||'').replace(/\D/g,'');if(n.startsWith('0'))n='233'+n.slice(1);else if(n.length===9)n='233'+n;return n}
 function messageFor(p){return 'Hello from FMM CLASSICO!\n\n'+(p.name||'Phone accessory')+'\nPrice: GH₵ '+(p.price||'—')+'\n\nView the product picture and details here:\n'+productUrl(p)}
-function openWhatsApp(p){const url='https://wa.me/'+recipient+'?text='+encodeURIComponent(messageFor(p));window.open(url,'_blank','noopener')}
-function render(){const root=$('products');root.replaceChildren();queue=products.filter(p=>p.visible!==false);if(!queue.length){root.textContent='No available products are currently listed.';return}queue.forEach(p=>{const card=document.createElement('article');card.className='card';const img=document.createElement('img');img.className='photo';img.alt=p.name||'Product';img.loading='lazy';img.src=imageOf(p);const info=document.createElement('div'),name=document.createElement('div'),price=document.createElement('div'),button=document.createElement('button');name.className='name';name.textContent=p.name||'Product';price.className='price';price.textContent='GH₵ '+(p.price||'—');button.textContent='Share this product';button.onclick=()=>{const n=normalizePhone($('phone').value);if(!/^233\d{9}$/.test(n)){ $('status').textContent='Enter a valid Ghana WhatsApp number first.'; $('phone').focus();return }recipient=n;openWhatsApp(p)};info.append(name,price,button);card.append(img,info);root.append(card)});$('status').textContent=queue.length+' available products ready to share.'}
-function showCurrent(){const p=queue[queueIndex];if(!p)return;$('progressWrap').hidden=false;$('currentImage').src=imageOf(p);$('currentImage').alt=p.name||'Product';$('currentName').textContent=p.name||'Product';$('currentPrice').textContent='GH₵ '+(p.price||'—');$('currentCount').textContent='Product '+(queueIndex+1)+' of '+queue.length;$('progressText').textContent=(queueIndex+1)+' / '+queue.length+' products in this customer's queue';$('progressBar').style.width=((queueIndex+1)/queue.length*100)+'%';$('openCurrent').textContent='Open product '+(queueIndex+1)+' in WhatsApp';$('next').disabled=queueIndex>=queue.length-1;$('next').textContent=queueIndex>=queue.length-1?'All products reached':'Next product →'}
-$('start').onclick=()=>{const n=normalizePhone($('phone').value);if(!/^233\d{9}$/.test(n)){$('status').textContent='Please enter a valid Ghana number, e.g. 0241234567 or 233241234567.';$('phone').focus();return}if(!queue.length){$('status').textContent='There are no available products to send.';return}recipient=n;queueIndex=0;showCurrent();$('status').textContent='Queue ready. Open the first message, tap Send in WhatsApp, then return here and tap Next product.';openWhatsApp(queue[0])};
+function openWhatsApp(p){const url='https://wa.me/?text='+encodeURIComponent(messageFor(p));window.location.href=url}
+function render(){const root=$('products');root.replaceChildren();queue=products.filter(p=>p.visible!==false);if(!queue.length){root.textContent='No available products are currently listed.';return}queue.forEach(p=>{const card=document.createElement('article');card.className='card';const img=document.createElement('img');img.className='photo';img.alt=p.name||'Product';img.loading='lazy';img.src=imageOf(p);const info=document.createElement('div'),name=document.createElement('div'),price=document.createElement('div'),button=document.createElement('button');name.className='name';name.textContent=p.name||'Product';price.className='price';price.textContent='GH₵ '+(p.price||'—');button.textContent='Share this product';button.onclick=()=>openWhatsApp(p);info.append(name,price,button);card.append(img,info);root.append(card)});$('status').textContent=queue.length+' available products ready to share.'}
+function showCurrent(){const p=queue[queueIndex];if(!p)return;$('progressWrap').hidden=false;$('currentImage').src=imageOf(p);$('currentImage').alt=p.name||'Product';$('currentName').textContent=p.name||'Product';$('currentPrice').textContent='GH₵ '+(p.price||'—');$('currentCount').textContent='Product '+(queueIndex+1)+' of '+queue.length;$('progressText').textContent=(queueIndex+1)+' / '+queue.length+' products in this customer's queue';$('progressBar').style.width=((queueIndex+1)/queue.length*100)+'%';$('openCurrent').textContent='Choose recipient for product '+(queueIndex+1);$('next').disabled=queueIndex>=queue.length-1;$('next').textContent=queueIndex>=queue.length-1?'All products reached':'Next product →'}
+$('start').onclick=()=>{if(!queue.length){$('status').textContent='There are no available products to share.';return}queueIndex=0;showCurrent();$('status').textContent='WhatsApp is opening. Choose the customer or group, send this product, then return here and tap Next product.';openWhatsApp(queue[0])};
 $('openCurrent').onclick=()=>{if(queue[queueIndex])openWhatsApp(queue[queueIndex])};
 $('next').onclick=()=>{if(queueIndex<queue.length-1){queueIndex++;showCurrent();$('status').textContent='Next product ready. Open it in WhatsApp, tap Send, then return for the next one.'}};
 $('reset').onclick=()=>{queueIndex=0;showCurrent();$('status').textContent='Queue restarted from the first product.'};
 $('back').onclick=()=>location.href='/admin.html';
-$('copyLink').onclick=async()=>{const link=SITE+'/catalogue';try{await navigator.clipboard.writeText(link);$('status').textContent='Full catalogue link copied.'}catch{$('status').textContent='Copy this catalogue link: '+link;prompt('Copy catalogue link',link)}};
+async function copyTextFallback(value){const field=document.createElement('textarea');field.value=value;field.setAttribute('readonly','');field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();field.setSelectionRange(0,field.value.length);let ok=false;try{ok=document.execCommand('copy')}catch{}field.remove();return ok}
+$('copyLink').onclick=async()=>{const link=SITE+'/catalogue';let copied=false;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(link);copied=true}}catch{}if(!copied)copied=copyTextFallback(link);$('status').textContent=copied?'Full catalogue link copied: '+link:'Automatic copy was blocked by your browser. Long-press this link to copy: '+link;};
 fetch('/api/catalogue',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Could not load catalogue');return r.json()}).then(data=>{products=data.products||[];render()}).catch(e=>{$('status').textContent=e.message});
 </script></body></html>
