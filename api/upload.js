@@ -1,4 +1,4 @@
-import { put, putImage } from '@vercel/blob';
+import { put, head } from '@vercel/blob';
 import { randomUUID } from 'node:crypto';
 import { isAdminAuthenticated } from '../lib/admin-auth.js';
 const TOKEN=process.env.BLOB_READ_WRITE_TOKEN;
@@ -16,12 +16,10 @@ export default async function handler(req,res){
   const bytes=Buffer.from(m[2],'base64');if(!bytes.length||bytes.length>3000000)return res.status(413).json({error:'Image must be 3 MB or smaller after optimisation.'});
   const name=String(body.name||'image').replace(/[^a-zA-Z0-9._-]/g,'-').slice(-70);
   const id=randomUUID();
-  let blob;
-  if(type==='image/gif'){
-   blob=await put('fmm-classico/media/'+id+'-'+name+'.gif',bytes,{access:'public',addRandomSuffix:false,contentType:type,token:TOKEN});
-  }else{
-   blob=await putImage('fmm-classico/media/'+id+'-'+name+'.webp',bytes,{access:'public',addRandomSuffix:false,token:TOKEN,optimizeImage:{width:1600,quality:76,format:'webp'}});
-  }
-  return res.status(200).json({success:true,url:blob.url,size:bytes.length,optimized:true});
+  const ext=type==='image/gif'?'gif':type==='image/png'?'png':type==='image/jpeg'?'jpg':'webp';
+  const blob=await put('fmm-classico/media/'+id+'-'+name+'.'+ext,bytes,{access:'public',addRandomSuffix:false,contentType:type,cacheControlMaxAge:31536000,token:TOKEN});
+  const stored=await head(blob.url,{token:TOKEN});
+  if(!stored||!stored.size||!String(stored.contentType||'').startsWith('image/'))throw new Error('Uploaded file could not be verified in image storage.');
+  return res.status(200).json({success:true,url:blob.url,size:stored.size,contentType:stored.contentType,verified:true});
  }catch(e){console.error('image upload',e);return res.status(500).json({error:'Image upload failed.'});}
 }
