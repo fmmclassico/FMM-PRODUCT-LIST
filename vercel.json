@@ -15,5 +15,11 @@
       "destination": "/admin.html",
       "permanent": false
     }
+  ],
+  "rewrites": [
+    {
+      "source": "/product/:id",
+      "destination": "/api/share?id=:id"
+    }
   ]
 }
