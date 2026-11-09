@@ -12,7 +12,7 @@ const q=new URLSearchParams(location.search),productId=q.get('productId')||'',fa
 let product=fallbackProduct,price=fallbackPrice,image='';
 async function loadRequestedProduct(){if(productId){try{const r=await fetch('/api/catalogue',{cache:'no-store'});if(r.ok){const data=await r.json(),p=(data.products||[]).find(x=>String(x.id)===productId&&x.visible!==false);if(p){product=p.name||product;price=p.price||price;const images=Array.isArray(p.images)&&p.images.length?p.images:[p.image||''];image=images.find(Boolean)||'';}}}catch(e){}}
 if(product){document.getElementById('item').hidden=false;document.getElementById('product').textContent=product;document.getElementById('price').textContent=price?'Price: GH₵ '+price:'';const im=document.getElementById('productImage');if(image){im.src=image;im.hidden=false}else{im.hidden=true}}
-const slug=String(product||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');const productUrl=slug?'https://products.fmmclassico.com/'+encodeURIComponent(slug):'';const message='Hello FMM CLASSICO, I would like to purchase '+(product||'your products')+(price?' (Price: GH₵ '+price+')':'')+'.'+(productUrl?' Product link: '+productUrl:'');
+const productUrl=productId?'https://products.fmmclassico.com/product/'+encodeURIComponent(productId):'';const message=(product||'Phone accessory')+' from FMM CLASSICO.\nView product: '+productUrl;
 const makeLink=number=>'https://wa.me/'+number+'?text='+encodeURIComponent(message);
 document.getElementById('fedra').href=makeLink('233599676419');document.getElementById('wilfred').href=makeLink('233505541594');
 }
