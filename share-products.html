@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#0878b9">
 <title>Share Products | FMM CLASSICO</title>
 <style>
 :root{--navy:#073451;--blue:#0878b9;--pale:#f1f8fc;--line:#d8e6ed;--ink:#243746;--muted:#637783}
@@ -12,12 +13,12 @@ main{max-width:1050px;margin:22px auto;padding:0 16px 42px}
 .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px;margin-bottom:18px}
 .panel h2{margin:0 0 8px;color:var(--navy);font-size:19px}
 .help{color:var(--muted);font-size:13px;line-height:1.55;margin:0 0 14px}
-.field{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
-input{min-width:0;flex:1;border:1px solid #cbdde6;border-radius:8px;padding:12px;font:inherit;font-size:15px}
+.actions{display:flex;flex-wrap:wrap;gap:9px;align-items:center}
 button,.btn{border:0;border-radius:8px;padding:12px 16px;background:var(--blue);color:#fff;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
-button.secondary{background:#fff;color:var(--blue);border:1px solid var(--line)}
+button.secondary,.btn.secondary{background:#fff;color:var(--blue);border:1px solid var(--line)}
 button:disabled{opacity:.45;cursor:not-allowed}
-#status{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.5}
+#status{font-size:13px;color:var(--muted);margin-top:12px;line-height:1.5;overflow-wrap:anywhere}
+#status.error{color:#a12622}
 .progress{height:8px;background:#eaf1f5;border-radius:99px;overflow:hidden;margin:12px 0 7px}.progress>span{display:block;height:100%;width:0;background:var(--blue);transition:width .2s}
 .current{display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:center;background:#f6fafc;border:1px solid var(--line);padding:12px;border-radius:10px;margin-top:14px}
 .current img{width:110px;height:120px;object-fit:contain;background:white;border:1px solid var(--line);border-radius:7px}
@@ -27,45 +28,99 @@ button:disabled{opacity:.45;cursor:not-allowed}
 .card{background:#fff;border:1px solid var(--line);border-radius:11px;padding:11px;display:grid;grid-template-columns:88px 1fr;gap:11px;align-items:center}
 .photo{width:88px;height:102px;object-fit:contain;background:#f7fafc;border-radius:8px;border:1px solid #edf2f5}
 .name{font-size:14px;font-weight:800;color:var(--navy);line-height:1.3;margin:2px 0 6px}.price{font-size:17px;font-weight:800;color:var(--blue)}
+.card a{display:inline-block;color:var(--blue);font-size:12px;margin-top:7px;text-decoration:underline}
 .card button{padding:8px 10px;font-size:12px;margin-top:8px}
 .warning{font-size:12px;color:#6b5726;background:#fff8e8;border:1px solid #f0dfb8;border-radius:8px;padding:11px;line-height:1.5;margin-top:13px}
-@media(max-width:480px){header{padding:20px 16px}.current{grid-template-columns:85px 1fr}.current img{width:85px;height:100px}.field button{width:100%}}
+.linkline{display:block;overflow-wrap:anywhere;color:var(--blue);font-size:13px;margin-top:8px}
+@media(max-width:480px){header{padding:20px 16px}.current{grid-template-columns:85px 1fr}.current img{width:85px;height:100px}.actions button{width:100%}}
 </style></head>
 <body>
-<header><h1>FMM CLASSICO — Share Products</h1><p>Share products through WhatsApp. Choose the customer or group inside WhatsApp; no phone-number entry is needed.</p></header>
+<header><h1>FMM CLASSICO — Share Products</h1><p>Share products through your iPhone or WhatsApp. Choose the customer or group from the share sheet; no phone-number entry is needed.</p></header>
 <main>
 <section class="panel">
  <h2>Share available products on WhatsApp</h2>
- <p class="help">No phone number needed. Tap Start, choose the customer or group inside WhatsApp, send the product, then return here for the next one.</p>
- <div class="field"><button id="start">Start sharing all products on WhatsApp</button></div>
+ <p class="help">Tap Start, choose WhatsApp from the iPhone share menu, select the customer or group and send. Return here for the next product.</p>
+ <div class="actions"><button id="start" disabled>Loading products…</button><button id="retry" class="secondary" type="button">Reload products</button></div>
  <div id="progressWrap" hidden><div class="progress"><span id="progressBar"></span></div><div id="progressText" class="help"></div>
   <div class="current"><img id="currentImage" alt="Current product"><div><div class="current-name" id="currentName"></div><div class="current-price" id="currentPrice"></div><div class="help" id="currentCount"></div></div></div>
-  <div class="queue-actions"><button id="openCurrent">Open this product in WhatsApp</button><button id="next" class="secondary">Next product →</button><button id="reset" class="secondary">Start again</button></div>
+  <div class="queue-actions"><button id="openCurrent">Share this product</button><button id="next" class="secondary">Next product →</button><button id="reset" class="secondary">Start again</button></div>
  </div>
- <div class="warning">WhatsApp lets you choose the recipient from its own contact list. This guided queue shares one product at a time: choose the customer or group and tap Send, then return here and tap Next product. You will choose the recipient again for each product. Each message contains its own product link; WhatsApp controls whether its link preview appears.</div>
- <div id="status">Loading available products…</div>
+ <div class="warning">Each product is shared separately so it can have its own product link and preview. You must choose the recipient again for each product. The share menu and WhatsApp control the final preview and sending.</div>
+ <div id="status" role="status" aria-live="polite">Connecting to the catalogue…</div>
+ <a class="linkline" href="https://products.fmmclassico.com/catalogue" target="_blank" rel="noopener">Open the full customer catalogue</a>
 </section>
-<section class="panel"><h2>Available products</h2><p class="help">You can also choose a recipient and share any single product.</p><div class="grid" id="products"></div></section>
-<div class="field"><button class="secondary" id="back">Back to Admin</button><button class="secondary" id="copyLink">Copy Full Catalogue Link</button></div>
+<section class="panel"><h2>Available products</h2><p class="help">You can share an individual product from here too.</p><div class="grid" id="products"></div></section>
+<div class="actions"><a class="btn secondary" href="/admin.html">Back to Admin</a><button class="secondary" id="copyLink" type="button">Copy Full Catalogue Link</button></div>
 </main>
 <script>
+'use strict';
 const SITE='https://products.fmmclassico.com';
 const $=id=>document.getElementById(id);
-let products=[],queue=[],queueIndex=0;
+let products=[],queue=[],queueIndex=0,loadAttempt=0;
 function slugify(value){return String(value||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'')}
 function productUrl(p){return SITE+'/'+encodeURIComponent(slugify(p.name))}
 function imageOf(p){return (Array.isArray(p.images)&&p.images[0])||p.image||''}
-function normalizePhone(raw){let n=String(raw||'').replace(/\D/g,'');if(n.startsWith('0'))n='233'+n.slice(1);else if(n.length===9)n='233'+n;return n}
 function messageFor(p){return 'Hello from FMM CLASSICO!\n\n'+(p.name||'Phone accessory')+'\nPrice: GH₵ '+(p.price||'—')+'\n\nView the product picture and details here:\n'+productUrl(p)}
-function openWhatsApp(p){const url='https://wa.me/?text='+encodeURIComponent(messageFor(p));window.location.href=url}
-function render(){const root=$('products');root.replaceChildren();queue=products.filter(p=>p.visible!==false);if(!queue.length){root.textContent='No available products are currently listed.';return}queue.forEach(p=>{const card=document.createElement('article');card.className='card';const img=document.createElement('img');img.className='photo';img.alt=p.name||'Product';img.loading='lazy';img.src=imageOf(p);const info=document.createElement('div'),name=document.createElement('div'),price=document.createElement('div'),button=document.createElement('button');name.className='name';name.textContent=p.name||'Product';price.className='price';price.textContent='GH₵ '+(p.price||'—');button.textContent='Share this product';button.onclick=()=>openWhatsApp(p);info.append(name,price,button);card.append(img,info);root.append(card)});$('status').textContent=queue.length+' available products ready to share.'}
-function showCurrent(){const p=queue[queueIndex];if(!p)return;$('progressWrap').hidden=false;$('currentImage').src=imageOf(p);$('currentImage').alt=p.name||'Product';$('currentName').textContent=p.name||'Product';$('currentPrice').textContent='GH₵ '+(p.price||'—');$('currentCount').textContent='Product '+(queueIndex+1)+' of '+queue.length;$('progressText').textContent=(queueIndex+1)+' / '+queue.length+' products in this customer's queue';$('progressBar').style.width=((queueIndex+1)/queue.length*100)+'%';$('openCurrent').textContent='Choose recipient for product '+(queueIndex+1);$('next').disabled=queueIndex>=queue.length-1;$('next').textContent=queueIndex>=queue.length-1?'All products reached':'Next product →'}
-$('start').onclick=()=>{if(!queue.length){$('status').textContent='There are no available products to share.';return}queueIndex=0;showCurrent();$('status').textContent='WhatsApp is opening. Choose the customer or group, send this product, then return here and tap Next product.';openWhatsApp(queue[0])};
-$('openCurrent').onclick=()=>{if(queue[queueIndex])openWhatsApp(queue[queueIndex])};
-$('next').onclick=()=>{if(queueIndex<queue.length-1){queueIndex++;showCurrent();$('status').textContent='Next product ready. Open it in WhatsApp, tap Send, then return for the next one.'}};
-$('reset').onclick=()=>{queueIndex=0;showCurrent();$('status').textContent='Queue restarted from the first product.'};
-$('back').onclick=()=>location.href='/admin.html';
-async function copyTextFallback(value){const field=document.createElement('textarea');field.value=value;field.setAttribute('readonly','');field.style.position='fixed';field.style.opacity='0';document.body.appendChild(field);field.select();field.setSelectionRange(0,field.value.length);let ok=false;try{ok=document.execCommand('copy')}catch{}field.remove();return ok}
-$('copyLink').onclick=async()=>{const link=SITE+'/catalogue';let copied=false;try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(link);copied=true}}catch{}if(!copied)copied=copyTextFallback(link);$('status').textContent=copied?'Full catalogue link copied: '+link:'Automatic copy was blocked by your browser. Long-press this link to copy: '+link;};
-fetch('/api/catalogue',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Could not load catalogue');return r.json()}).then(data=>{products=data.products||[];render()}).catch(e=>{$('status').textContent=e.message});
+function setStatus(message,isError=false){$('status').textContent=message;$('status').classList.toggle('error',isError)}
+async function shareProduct(p){
+ const url=productUrl(p),text='Hello from FMM CLASSICO!\n\n'+(p.name||'Phone accessory')+'\nPrice: GH₵ '+(p.price||'—');
+ if(navigator.share){
+  try{await navigator.share({title:p.name||'FMM CLASSICO product',text,url});setStatus('Share menu opened. Choose WhatsApp and select the recipient.');return}
+  catch(e){if(e&&e.name==='AbortError'){setStatus('Sharing cancelled. You can try again.');return}}
+ }
+ const wa='https://api.whatsapp.com/send?text='+encodeURIComponent(text+'\n\nView product picture and details: '+url);
+ window.location.href=wa;
+}
+function render(){
+ const root=$('products');root.replaceChildren();
+ queue=products.filter(p=>p&&p.visible!==false);
+ if(!queue.length){root.textContent='No products are currently marked as available.';$('start').disabled=true;return}
+ queue.forEach(p=>{
+  const card=document.createElement('article');card.className='card';
+  const img=document.createElement('img');img.className='photo';img.alt=p.name||'Product';img.loading='lazy';img.src=imageOf(p);
+  const info=document.createElement('div'),name=document.createElement('div'),price=document.createElement('div'),button=document.createElement('button'),link=document.createElement('a');
+  name.className='name';name.textContent=p.name||'Product';price.className='price';price.textContent='GH₵ '+(p.price||'—');
+  button.type='button';button.textContent='Share this product';button.addEventListener('click',()=>shareProduct(p));
+  link.href=productUrl(p);link.target='_blank';link.rel='noopener';link.textContent='Open product details';
+  info.append(name,price,button,link);card.append(img,info);root.append(card);
+ });
+ $('start').disabled=false;$('start').textContent='Start sharing all products on WhatsApp';
+ setStatus(queue.length+' available products loaded successfully.');
+}
+function showCurrent(){
+ const p=queue[queueIndex];if(!p)return;
+ $('progressWrap').hidden=false;$('currentImage').src=imageOf(p);$('currentImage').alt=p.name||'Product';
+ $('currentName').textContent=p.name||'Product';$('currentPrice').textContent='GH₵ '+(p.price||'—');
+ $('currentCount').textContent='Product '+(queueIndex+1)+' of '+queue.length;
+ $('progressText').textContent=(queueIndex+1)+' / '+queue.length+' products in the sharing queue';
+ $('progressBar').style.width=((queueIndex+1)/queue.length*100)+'%';
+ $('openCurrent').textContent='Share product '+(queueIndex+1);
+ $('next').disabled=queueIndex>=queue.length-1;$('next').textContent=queueIndex>=queue.length-1?'All products reached':'Next product →';
+}
+$('start').addEventListener('click',async()=>{if(!queue.length)return;queueIndex=0;showCurrent();await shareProduct(queue[0])});
+$('openCurrent').addEventListener('click',async()=>{if(queue[queueIndex])await shareProduct(queue[queueIndex])});
+$('next').addEventListener('click',()=>{if(queueIndex<queue.length-1){queueIndex++;showCurrent();setStatus('Next product ready. Tap Share this product, choose WhatsApp and select the recipient.')}});
+$('reset').addEventListener('click',()=>{if(!queue.length)return;queueIndex=0;showCurrent();setStatus('Queue restarted from the first product.')});
+$('retry').addEventListener('click',loadProducts);
+async function loadProducts(){
+ loadAttempt++;$('start').disabled=true;$('start').textContent='Loading products…';setStatus('Loading available products…');
+ const controller=new AbortController(),timer=setTimeout(()=>controller.abort(),20000);
+ try{
+  const response=await fetch(SITE+'/api/catalogue?sharePage='+loadAttempt+'&_='+Date.now(),{method:'GET',cache:'no-store',credentials:'same-origin',headers:{'Accept':'application/json'},signal:controller.signal});
+  if(!response.ok)throw new Error('Catalogue server returned '+response.status+'.');
+  const data=await response.json();
+  if(!data||!Array.isArray(data.products))throw new Error('The catalogue response did not contain a product list.');
+  products=data.products;render();
+ }catch(error){
+  $('start').disabled=true;$('start').textContent='Products could not load';
+  const reason=error&&error.name==='AbortError'?'The request timed out.':(error&&error.message?error.message:'Network connection failed.');
+  setStatus(reason+' Check your internet connection and tap Reload products. You can still open the customer catalogue using the link above.',true);
+ }finally{clearTimeout(timer)}
+}
+async function copyText(value){
+ try{if(navigator.clipboard&&window.isSecureContext){await navigator.clipboard.writeText(value);return true}}catch{}
+ try{const field=document.createElement('textarea');field.value=value;field.setAttribute('readonly','');field.style.position='fixed';field.style.left='-9999px';document.body.appendChild(field);field.focus();field.select();field.setSelectionRange(0,value.length);const ok=document.execCommand('copy');field.remove();return ok}catch{return false}
+}
+$('copyLink').addEventListener('click',async()=>{const link=SITE+'/catalogue';const ok=await copyText(link);setStatus(ok?'Full catalogue link copied: '+link:'Copy is blocked in this browser. Press and hold the catalogue link above to copy it: '+link,!ok)});
+loadProducts();
 </script></body></html>
