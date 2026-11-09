@@ -22,7 +22,7 @@ button.secondary,.btn.secondary{background:#fff;color:var(--blue);border:1px sol
 @media(max-width:420px){.card{grid-template-columns:92px 1fr;padding:10px;gap:10px}.photo{width:92px;height:116px}.name{font-size:16px}.actions button{padding:8px;font-size:11px}}
 </style></head><body>
 <header><h1>FMM CLASSICO — Share Products</h1><p>Share each product separately. Every link opens its own product details and displays that product's picture and information in the social preview.</p></header>
-<main><div class="toolbar"><button class="secondary" id="back">Back to Admin</button><button id="copyAll">Copy All Product Links</button><span id="status">Loading products…</span></div><div class="grid" id="products"></div></main>
+<main><div class="toolbar"><button class="secondary" id="back">Back to Admin</button><button id="sendAllWhatsApp">Send All on WhatsApp</button><button class="secondary" id="copyAll">Copy All Product Links</button><span id="status">Loading products…</span></div><div class="grid" id="products"></div></main>
 <script>
 const SITE='https://products.fmmclassico.com';
 const $=id=>document.getElementById(id);
@@ -37,7 +37,7 @@ async function share(p){
  if(navigator.share){try{await navigator.share({title,text,url});$('status').textContent='Share sheet opened for '+title;return}catch(e){if(e.name==='AbortError')return}}
  window.open('https://wa.me/?text='+encodeURIComponent(text+'\n'+url),'_blank','noopener');
 }
-function render(){
+function bulkMessage(){\n const visible=products.filter(p=>p.visible!==false);\n return 'FMM CLASSICO | PHONE ACCESSORIES\\nYour Trusted Destination For Quality Products.\\n\\nBrowse our available products and contact us to order.\\n\\n'+visible.map((p,i)=>(i+1)+'. '+(p.name||'Product')+' — GH₵ '+(p.price||'Price on request')+'\\n'+urlFor(p)).join('\\n\\n')+'\\n\\nView the full catalogue: '+SITE+'/catalogue';\n}\nfunction render(){
  const root=$('products');root.innerHTML='';
  const visible=products.filter(p=>p.visible!==false);
  if(!visible.length){root.innerHTML='<div class="empty">No visible products are currently available to share.</div>';return}
@@ -58,6 +58,6 @@ function render(){
  $('status').textContent=visible.length+' products ready to share individually.';
 }
 $('back').onclick=()=>location.href='/admin.html';
-$('copyAll').onclick=()=>copy(products.filter(p=>p.visible!==false).map(p=>(p.name||'Product')+' — '+urlFor(p)).join('\n'),'All product links');
+$('copyAll').onclick=()=>copy(products.filter(p=>p.visible!==false).map(p=>(p.name||'Product')+' — '+urlFor(p)).join('\n'),'All product links');\n$('sendAllWhatsApp').onclick=()=>{if(!products.some(p=>p.visible!==false)){ $('status').textContent='No available products to share.';return;} const message=bulkMessage(); window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener'); $('status').textContent='WhatsApp opened with all visible products and their individual links.'};
 fetch('/api/catalogue',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Could not load catalogue');return r.json()}).then(data=>{products=data.products||[];render()}).catch(e=>{$('status').textContent=e.message});
 </script></body></html>
