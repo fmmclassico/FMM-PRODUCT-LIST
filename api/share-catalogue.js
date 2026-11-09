@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     const response = await fetch(file.url, { cache: 'no-store' });
     if (!response.ok) throw new Error('Could not read catalogue.');
     const data = await response.json();
-    const title = data.shareTitle || data.brand || 'FMM CLASSICO | Phone Accessories';
+    const title = 'FMM CLASSICO- Products list';
     const description = String(data.shareDescription || data.catalogueIntro || 'Browse quality phone accessories at affordable prices.').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
     const imageCandidate = data.shareImageUrl || data.banners?.find((banner) => banner.image)?.image || '';
     let image = /^https:\/\//i.test(imageCandidate) ? imageCandidate : '';
@@ -40,7 +40,7 @@ export default async function handler(req, res) {
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${SITE}/"><meta property="og:locale" content="en_GH">
 ${image ? `<meta property="og:image" content="${esc(image)}"><meta property="og:image:secure_url" content="${esc(image)}"><meta property="og:image:alt" content="${esc(title)}"><meta name="twitter:image" content="${esc(image)}">` : ''}
 <meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}">
-</head><body><h1>${esc(title)}</h1><p>${esc(description)}</p><a href="${SITE}/">Open FMM CLASSICO catalogue</a><script>window.location.replace('/');</script></body></html>`);
+</head><body><h1>${esc(title)}</h1><p>${esc(description)}</p><a href="${SITE}/">Open FMM CLASSICO- Products list</a><script>window.location.replace('/');</script></body></html>`);
   } catch (error) {
     console.error('catalogue share preview', error);
     return res.status(500).send('Could not prepare the catalogue preview.');
