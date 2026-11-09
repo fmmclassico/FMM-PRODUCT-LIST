@@ -2,7 +2,7 @@ import { list } from '@vercel/blob';
 
 const TOKEN = process.env.BLOB_READ_WRITE_TOKEN;
 const CATALOGUE_PATH = 'fmm-classico/catalogue.json';
-const SITE = 'https://fmmclassicoproduct.vercel.app';
+const SITE = 'https://products.fmmclassico.com';
 
 const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
