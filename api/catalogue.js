@@ -29,7 +29,7 @@ async function readCatalogue(){
  return data;
 }
 export default async function handler(req,res){
- res.setHeader('Cache-Control','no-store, max-age=0');res.setHeader('X-Content-Type-Options','nosniff');
+ res.setHeader('Cache-Control',isAdminAuthenticated(req)?'private, no-store, max-age=0':'public, max-age=0, s-maxage=15, stale-while-revalidate=60');res.setHeader('X-Content-Type-Options','nosniff');
  if(req.method==='OPTIONS')return res.status(204).end();
  if(req.method==='GET'){
   try{
