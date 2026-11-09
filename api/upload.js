@@ -1,10 +1,12 @@
 import { put } from '@vercel/blob';
 import { randomUUID } from 'node:crypto';
+import { isAdminAuthenticated } from './_auth.js';
 const TOKEN=process.env.BLOB_READ_WRITE_TOKEN;
 const TYPES=new Set(['image/jpeg','image/png','image/webp','image/gif']);
 export default async function handler(req,res){
  res.setHeader('Cache-Control','no-store');res.setHeader('X-Content-Type-Options','nosniff');
  if(req.method!=='POST'){res.setHeader('Allow','POST');return res.status(405).json({error:'Method not allowed.'});}
+ if(!isAdminAuthenticated(req))return res.status(401).json({error:'Admin login required.'});
  if(!TOKEN)return res.status(503).json({error:'Image storage is not connected.'});
  try{
   const body=typeof req.body==='string'?JSON.parse(req.body):req.body;
