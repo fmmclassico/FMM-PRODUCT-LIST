@@ -11,6 +11,7 @@ const DEFAULTS={
  "shareDescription":"Discover quality phone accessories at affordable prices. Browse the catalogue and order directly on WhatsApp.",
  "shareImageUrl":"","banners":[{"id":"default-banner","title":"DISCOVER OUR PHONE ACCESSORIES","text":"Our latest phone accessories. Quality products at affordable prices.","image":"fmm_phone_accessories_banner.jpg"}],"products":[]
 };
+function publicCatalogue(data){return {...data,products:(data.products||[]).map(({stockStatus,stockQuantity,stockNote,...product})=>product)}}
 async function readCatalogue(){
  if(!TOKEN)return null;
  const {blobs=[]}=await list({prefix:'',token:TOKEN});
@@ -33,10 +34,10 @@ export default async function handler(req,res){
  if(req.method==='GET'){
   try{
    const stored=await readCatalogue();
-   if(stored)return res.status(200).json(stored);
+   if(stored)return res.status(200).json(isAdminAuthenticated(req)?stored:publicCatalogue(stored));
    const value=structuredClone(DEFAULTS);
    if(TOKEN){const {blobs=[]}=await list({prefix:'',token:TOKEN});const img=blobs.find(x=>x.pathname.split('/').pop()==='fmm_phone_accessories_banner.jpg'&&x.contentType?.startsWith('image/'))||blobs.find(x=>x.contentType?.startsWith('image/'));if(img)value.banners[0].image=img.url;else value.banners[0].image='';}
-   return res.status(200).json(value);
+   return res.status(200).json(isAdminAuthenticated(req)?value:publicCatalogue(value));
   }catch(e){console.error('catalogue GET',e);return res.status(500).json({error:'Could not load the saved catalogue.'});}
  }
  if(!['PUT','POST'].includes(req.method)){res.setHeader('Allow','GET, PUT, POST, OPTIONS');return res.status(405).json({error:'Method not allowed.'});}
