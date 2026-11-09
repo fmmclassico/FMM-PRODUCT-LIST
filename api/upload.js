@@ -1,6 +1,6 @@
 import { put } from '@vercel/blob';
 import { randomUUID } from 'node:crypto';
-import { isAdminAuthenticated } from './_auth.js';
+import { isAdminAuthenticated } from '../lib/admin-auth.js';
 const TOKEN=process.env.BLOB_READ_WRITE_TOKEN;
 const TYPES=new Set(['image/jpeg','image/png','image/webp','image/gif']);
 export default async function handler(req,res){
