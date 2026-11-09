@@ -1,0 +1,26 @@
+{
+  "brand": "FMM CLASSICO",
+  "tagline": "PHONE ACCESSORIES • QUALITY • AFFORDABILITY",
+  "edition": "FMM CLASSICO PHONE ACCESSORIES",
+  "heroTitle": "DISCOVER OUR PHONE ACCESSORIES",
+  "heroText": "Our latest phone accessories. Quality products at affordable prices.",
+  "catalogueTitle": "Our Phone Accessories",
+  "catalogueIntro": "Browse our catalogue and order directly on WhatsApp.",
+  "footerTitle": "FMM CLASSICO",
+  "footerSlogan": "QUALITY PRODUCTS. AFFORDABLE PRICES.",
+  "whatsapp": "233599676419",
+  "location": "",
+  "social": "",
+  "shareTitle": "FMM CLASSICO | Phone Accessories",
+  "shareDescription": "Discover quality phone accessories at affordable prices. Browse the catalogue and order directly on WhatsApp.",
+  "shareImageUrl": "",
+  "banners": [
+    {
+      "id": "default-banner",
+      "title": "DISCOVER OUR PHONE ACCESSORIES",
+      "text": "Our latest phone accessories. Quality products at affordable prices.",
+      "image": "fmm_phone_accessories_banner.jpg"
+    }
+  ],
+  "products": []
+}
