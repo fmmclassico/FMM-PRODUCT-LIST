@@ -1,67 +1,63 @@
 <!doctype html>
-<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Share Products | FMM CLASSICO</title>
+<html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Share Full Catalogue | FMM CLASSICO</title>
 <style>
 :root{--navy:#073451;--blue:#0878b9;--pale:#f1f8fc;--line:#d8e6ed;--ink:#243746}
 *{box-sizing:border-box}body{margin:0;background:#f5f8fa;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
 header{background:#fff;border-top:8px solid var(--blue);padding:22px max(18px,calc((100% - 1100px)/2));box-shadow:0 2px 10px #07345112}
-h1{margin:0;color:var(--navy);font-size:27px}header p{margin:7px 0 0;color:#637783;line-height:1.5}
+h1{margin:0;color:var(--navy);font-size:26px}header p{margin:7px 0 0;color:#637783;line-height:1.5}
 main{max-width:1100px;margin:24px auto;padding:0 16px 40px}
 .toolbar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin-bottom:18px}
 button,.btn{border:0;border-radius:8px;padding:12px 16px;background:var(--blue);color:#fff;font-weight:700;font-size:14px;cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;justify-content:center}
-button.secondary,.btn.secondary{background:#fff;color:var(--blue);border:1px solid var(--line)}
+button.secondary{background:#fff;color:var(--blue);border:1px solid var(--line)}
 #status{font-size:13px;color:#637783}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:16px}
-.card{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px;display:grid;grid-template-columns:112px 1fr;gap:13px;align-items:start}
-.photo{width:112px;height:132px;object-fit:contain;background:#f7fafc;border-radius:8px;border:1px solid #edf2f5}
-.name{font-size:18px;font-weight:800;color:var(--navy);line-height:1.25;margin:2px 0 7px}
-.desc{font-size:13px;line-height:1.45;color:#50616d;margin:0 0 7px}
-.price{font-size:19px;font-weight:800;color:var(--blue);margin-bottom:12px}
-.actions{display:flex;gap:7px;flex-wrap:wrap}.actions button{font-size:12px;padding:9px 10px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:14px}
+.card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:12px;display:grid;grid-template-columns:100px 1fr;gap:12px;align-items:center}
+.photo{width:100px;height:116px;object-fit:contain;background:#f7fafc;border-radius:8px;border:1px solid #edf2f5}
+.name{font-size:16px;font-weight:800;color:var(--navy);line-height:1.25;margin:2px 0 7px}
+.price{font-size:18px;font-weight:800;color:var(--blue)}
 .empty{background:#fff;border:1px solid var(--line);padding:22px;border-radius:12px;color:#637783}
-@media(max-width:420px){.card{grid-template-columns:92px 1fr;padding:10px;gap:10px}.photo{width:92px;height:116px}.name{font-size:16px}.actions button{padding:8px;font-size:11px}}
-</style></head><body>
-<header><h1>FMM CLASSICO — Share Products</h1><p>Share each product separately. Every link opens its own product details and displays that product's picture and information in the social preview.</p></header>
-<main><div class="toolbar"><button class="secondary" id="back">Back to Admin</button><button id="sendAllWhatsApp">Send All on WhatsApp</button><button class="secondary" id="copyAll">Copy All Product Links</button><span id="status">Loading products…</span></div><div class="grid" id="products"></div></main>
+@media(max-width:420px){.card{grid-template-columns:86px 1fr;padding:10px;gap:10px}.photo{width:86px;height:104px}}
+</style></head>
+<body>
+<header><h1>FMM CLASSICO — Full Catalogue Sharing</h1><p>Share all available products together in one WhatsApp message. Customers open one catalogue link to browse every product, view its pictures and details, and order individually.</p></header>
+<main>
+<div class="toolbar"><button class="secondary" id="back">Back to Admin</button><button id="shareAll">Share Full Catalogue on WhatsApp</button><button class="secondary" id="copyLink">Copy Catalogue Link</button><span id="status">Loading available products…</span></div>
+<div class="grid" id="products"></div>
+</main>
 <script>
 const SITE='https://products.fmmclassico.com';
+const CATALOGUE=SITE+'/catalogue';
 const $=id=>document.getElementById(id);
-const slug=name=>String(name||'').normalize('NFKD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/[^a-z0-9]+/g,'-').replace(/^-+|-+$/g,'');
 let products=[];
-function urlFor(p){return SITE+'/'+encodeURIComponent(slug(p.name));}
-function orderUrl(p){return SITE+'/whatsapp.html?productId='+encodeURIComponent(p.id||'')+'&product='+encodeURIComponent(p.name||'')+'&price='+encodeURIComponent(p.price||'');}
-async function copy(text,label){try{await navigator.clipboard.writeText(text);$('status').textContent=label+' copied.'}catch{$('status').textContent='Please copy the link shown.';prompt('Copy '+label,text)}}
-async function share(p){
- const url=urlFor(p), title=p.name||'FMM CLASSICO product';
- const text='I would like to share this product from FMM CLASSICO: '+title+(p.price?' — GH₵ '+p.price:'');
- if(navigator.share){try{await navigator.share({title,text,url});$('status').textContent='Share sheet opened for '+title;return}catch(e){if(e.name==='AbortError')return}}
- window.open('https://wa.me/?text='+encodeURIComponent(text+'\n'+url),'_blank','noopener');
+function shareCatalogue(){
+ const message='FMM CLASSICO | PHONE ACCESSORIES\nYour Trusted Destination For Quality Products.\n\nBrowse our full catalogue to see all available products, pictures, prices and details. Open any product to view more information and place your order.\n\n'+CATALOGUE;
+ const url='https://wa.me/?text='+encodeURIComponent(message);
+ window.open(url,'_blank','noopener');
+ $('status').textContent='WhatsApp opened with one full-catalogue message.';
 }
-function bulkMessage(){
- const visible=products.filter(p=>p.visible!==false);
- return 'FMM CLASSICO | PHONE ACCESSORIES\nYour Trusted Destination For Quality Products.\n\nBrowse our available products and contact us to order.\n\n'+visible.map((p,i)=>(i+1)+'. '+(p.name||'Product')+' — GH₵ '+(p.price||'Price on request')+'\n'+urlFor(p)).join('\n\n')+'\n\nView the full catalogue: '+SITE+'/catalogue';
+async function copyLink(){
+ try{await navigator.clipboard.writeText(CATALOGUE);$('status').textContent='Full catalogue link copied.'}
+ catch{$('status').textContent='Copy this catalogue link: '+CATALOGUE;prompt('Copy catalogue link',CATALOGUE)}
 }
 function render(){
- const root=$('products');root.innerHTML='';
- const visible=products.filter(p=>p.visible!==false);
- if(!visible.length){root.innerHTML='<div class="empty">No visible products are currently available to share.</div>';return}
- visible.forEach(p=>{
+ const root=$('products');root.replaceChildren();
+ const available=products.filter(p=>p.visible!==false);
+ if(!available.length){root.innerHTML='<div class="empty">No available products are currently listed.</div>';return}
+ available.forEach(p=>{
   const card=document.createElement('article');card.className='card';
-  const im=document.createElement('img');im.className='photo';im.alt=p.name||'Product';im.src=(Array.isArray(p.images)&&p.images[0])||p.image||'';im.loading='lazy';
-  const info=document.createElement('div');
-  const name=document.createElement('div');name.className='name';name.textContent=p.name||'Untitled product';
-  const desc=document.createElement('p');desc.className='desc';desc.textContent=p.shortDescription||p.description||'View product details and pictures.';
-  const price=document.createElement('div');price.className='price';price.textContent='GH₵ '+(p.price||'—');
-  const actions=document.createElement('div');actions.className='actions';
-  const shareBtn=document.createElement('button');shareBtn.textContent='Share';shareBtn.onclick=()=>share(p);
-  const wa=document.createElement('button');wa.className='secondary';wa.textContent='WhatsApp';wa.onclick=()=>window.open('https://wa.me/?text='+encodeURIComponent('I would like to share '+(p.name||'this product')+' from FMM CLASSICO.\n'+urlFor(p)),'_blank','noopener');
-  const copyBtn=document.createElement('button');copyBtn.className='secondary';copyBtn.textContent='Copy Link';copyBtn.onclick=()=>copy(urlFor(p),'Product link');
-  const view=document.createElement('a');view.className='btn secondary';view.textContent='View';view.href=urlFor(p);view.target='_blank';view.rel='noopener';
-  actions.append(shareBtn,wa,copyBtn,view);info.append(name,desc,price,actions);card.append(im,info);root.append(card);
+  const image=document.createElement('img');image.className='photo';image.alt=p.name||'Product';image.loading='lazy';image.src=(Array.isArray(p.images)&&p.images[0])||p.image||'';
+  const info=document.createElement('div'),name=document.createElement('div'),price=document.createElement('div');
+  name.className='name';name.textContent=p.name||'Product';
+  price.className='price';price.textContent='GH₵ '+(p.price||'—');
+  info.append(name,price);card.append(image,info);root.append(card);
  });
- $('status').textContent=visible.length+' products ready to share individually.';
+ $('status').textContent=available.length+' available products included in the full catalogue.';
 }
 $('back').onclick=()=>location.href='/admin.html';
-$('copyAll').onclick=()=>copy(products.filter(p=>p.visible!==false).map(p=>(p.name||'Product')+' — '+urlFor(p)).join('\n'),'All product links');\n$('sendAllWhatsApp').onclick=()=>{if(!products.some(p=>p.visible!==false)){ $('status').textContent='No available products to share.';return;} const message=bulkMessage(); window.open('https://wa.me/?text='+encodeURIComponent(message),'_blank','noopener'); $('status').textContent='WhatsApp opened with all visible products and their individual links.'};
+$('shareAll').onclick=shareCatalogue;
+$('copyLink').onclick=copyLink;
 fetch('/api/catalogue',{cache:'no-store'}).then(r=>{if(!r.ok)throw Error('Could not load catalogue');return r.json()}).then(data=>{products=data.products||[];render()}).catch(e=>{$('status').textContent=e.message});
 </script></body></html>
