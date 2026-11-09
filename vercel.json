@@ -20,6 +20,10 @@
     {
       "source": "/product/:id",
       "destination": "/api/share?id=:id"
+    },
+    {
+      "source": "/catalogue",
+      "destination": "/api/share-catalogue"
     }
   ]
 }
