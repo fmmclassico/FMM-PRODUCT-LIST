@@ -8,6 +8,8 @@ const esc = (value) => String(value ?? '').replace(/[&<>"']/g, (c) => ({
   '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
 }[c]));
 
+const slugify = (value) => String(value || '').normalize('NFKD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+
 function cleanDescription(value) {
   return String(value || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 300);
 }
@@ -53,14 +55,16 @@ export default async function handler(req, res) {
   res.setHeader('Vary', 'User-Agent');
   const url = new URL(req.url || '/', SITE);
   const id = String(req.query?.id || url.searchParams.get('id') || '').slice(0, 160);
-  if (!id) return res.status(400).send('A product ID is required.');
+  const slug = String(req.query?.slug || url.searchParams.get('slug') || '').slice(0, 180);
+  if (!id && !slug) return res.status(400).send('A product name is required.');
 
   try {
     const { data, blobs } = await getCatalogue();
-    const product = (data.products || []).find((item) => String(item.id) === id && item.visible !== false);
+    const product = (data.products || []).find((item) => item.visible !== false && (id ? String(item.id) === id : slugify(item.name) === slug));
     if (!product) return res.status(404).send('This product is unavailable.');
 
-    const productUrl = SITE + '/product/' + encodeURIComponent(id);
+    const productSlug = slugify(product.name);
+    const productUrl = SITE + '/' + encodeURIComponent(productSlug);
     const title = (product.name || 'Phone accessory') + ' | ' + (data.brand || 'FMM CLASSICO');
     const description = cleanDescription(product.shortDescription || product.description || 'View product details and order from FMM CLASSICO.');
     const image = getProductImage(product, data, blobs);
@@ -87,7 +91,7 @@ export default async function handler(req, res) {
 <meta property="og:locale" content="en_GH">${imageTags}
 <meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">
 <meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}">
-</head><body><main><h1>${esc(product.name || 'Phone accessory')}</h1><p>${esc(description)}</p><p>Price: GH₵ ${esc(price)}</p><p><a href="/product.html?id=${encodeURIComponent(id)}">View full product details</a></p><p><a href="${esc(orderUrl)}">Order on WhatsApp</a></p></main><script>window.location.replace('/product.html?id=${encodeURIComponent(id)}');</script></body></html>`);
+</head><body><main><h1>${esc(product.name || 'Phone accessory')}</h1><p>${esc(description)}</p><p>Price: GH₵ ${esc(price)}</p><p><a href="/product.html?id=${encodeURIComponent(product.id)}">View full product details</a></p><p><a href="${esc(orderUrl)}">Order on WhatsApp</a></p></main><script>window.location.replace('/product.html?id=${encodeURIComponent(product.id)}');</script></body></html>`);
   } catch (error) {
     console.error('product share preview', error);
     return res.status(500).send('Could not prepare this product preview.');
