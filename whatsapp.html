@@ -9,7 +9,7 @@
 <a class="back" href="/">← Back to catalogue</a></section><footer class="foot">FMM CLASSICO · QUALITY PRODUCTS</footer></main>
 <script>
 const q=new URLSearchParams(location.search),productId=q.get('productId')||'',fallbackProduct=q.get('product')||'',fallbackPrice=q.get('price')||'';
-const productUrl=productId?'https://fmmclassicoproduct.vercel.app/product/'+encodeURIComponent(productId):'';
+const productUrl=productId?'https://products.fmmclassico.com/product/'+encodeURIComponent(productId):'';
 let product=fallbackProduct,price=fallbackPrice,image='';
 async function loadRequestedProduct(){if(productId){try{const r=await fetch('/api/catalogue',{cache:'no-store'});if(r.ok){const data=await r.json(),p=(data.products||[]).find(x=>String(x.id)===productId&&x.visible!==false);if(p){product=p.name||product;price=p.price||price;const images=Array.isArray(p.images)&&p.images.length?p.images:[p.image||''];image=images.find(Boolean)||'';}}}catch(e){}}
 if(product){document.getElementById('item').hidden=false;document.getElementById('product').textContent=product;document.getElementById('price').textContent=price?'Price: GH₵ '+price:'';const im=document.getElementById('productImage');if(image){im.src=image;im.hidden=false}else{im.hidden=true}}
