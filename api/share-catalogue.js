@@ -31,10 +31,6 @@ export default async function handler(req, res) {
       const match = blobs.find((item) => item.pathname.split('/').pop() === imageCandidate.split('/').pop() && item.contentType?.startsWith('image/'));
       if (match) image = match.url;
     }
-    if (!isSocialCrawler(req.headers['user-agent'] || '')) {
-      res.setHeader('Cache-Control', 'no-store');
-      return res.redirect(302, '/');
-    }
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     return res.status(200).send(`<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -44,7 +40,7 @@ export default async function handler(req, res) {
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}"><meta property="og:url" content="${SITE}/"><meta property="og:locale" content="en_GH">
 ${image ? `<meta property="og:image" content="${esc(image)}"><meta property="og:image:secure_url" content="${esc(image)}"><meta property="og:image:alt" content="${esc(title)}"><meta name="twitter:image" content="${esc(image)}">` : ''}
 <meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}">
-</head><body><h1>${esc(title)}</h1><p>${esc(description)}</p><a href="${SITE}/">Open FMM CLASSICO catalogue</a></body></html>`);
+</head><body><h1>${esc(title)}</h1><p>${esc(description)}</p><a href="${SITE}/">Open FMM CLASSICO catalogue</a><script>window.location.replace('/');</script></body></html>`);
   } catch (error) {
     console.error('catalogue share preview', error);
     return res.status(500).send('Could not prepare the catalogue preview.');
