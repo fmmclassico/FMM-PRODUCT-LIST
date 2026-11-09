@@ -5,12 +5,17 @@ const CATALOGUE_PATH='fmm-classico/catalogue.json';
 
 async function probe(url){
   try{
-    let r=await fetch(url,{method:'HEAD',signal:AbortSignal.timeout(10000),cache:'no-store'});
-    if(r.status===405||r.status===403){
-      r=await fetch(url,{method:'GET',headers:{Range:'bytes=0-0'},signal:AbortSignal.timeout(10000),cache:'no-store'});
-    }
+    const r=await fetch(url,{method:'GET',headers:{Range:'bytes=0-31'},signal:AbortSignal.timeout(15000),cache:'no-store'});
     const type=r.headers.get('content-type')||'';
-    return {ok:r.ok&&(type.startsWith('image/')||r.status===206),status:r.status,contentType:type};
+    if(!r.ok&&r.status!==206)return {ok:false,status:r.status,contentType:type,error:'image request failed'};
+    const bytes=new Uint8Array(await r.arrayBuffer());
+    const ascii=(a,b)=>String.fromCharCode(...bytes.slice(a,b));
+    const jpeg=bytes[0]===0xff&&bytes[1]===0xd8&&bytes[2]===0xff;
+    const png=bytes.length>=8&&bytes[0]===137&&ascii(1,4)==='PNG';
+    const gif=ascii(0,3)==='GIF';
+    const webp=ascii(0,4)==='RIFF'&&ascii(8,12)==='WEBP';
+    const valid=jpeg||png||gif||webp;
+    return {ok:type.startsWith('image/')&&valid,status:r.status,contentType:type,format:jpeg?'jpeg':png?'png':gif?'gif':webp?'webp':'unknown',bytesChecked:bytes.length,...(!valid?{error:'response does not contain a recognized image file'}:{})};
   }catch(e){return {ok:false,status:0,error:e.name==='TimeoutError'?'timeout':'network error'};}
 }
 
