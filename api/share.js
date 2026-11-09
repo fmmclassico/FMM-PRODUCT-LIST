@@ -64,8 +64,8 @@ export default async function handler(req, res) {
     if (!product) return res.status(404).send('This product is unavailable.');
 
     const productSlug = slugify(product.name);
-    const productUrl = SITE + '/' + encodeURIComponent(productSlug);
-    const title = (product.name || 'Phone accessory') + ' | ' + (data.brand || 'FMM CLASSICO');
+    const productUrl = SITE + '/product/' + encodeURIComponent(product.id);
+    const title = (product.name || 'Phone accessory') + ' from ' + (data.brand || 'FMM CLASSICO') + '.';
     const description = cleanDescription(product.shortDescription || product.description || 'View product details and order from FMM CLASSICO.');
     const image = getProductImage(product, data, blobs);
     const price = String(product.price || '').trim();
