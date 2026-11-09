@@ -71,7 +71,7 @@ export default async function handler(req, res) {
 
     if (!isSocialCrawler(req.headers['user-agent'] || '')) {
       res.setHeader('Cache-Control', 'no-store');
-      return res.redirect(302, '/?product=' + encodeURIComponent(id));
+      return res.redirect(302, '/product.html?id=' + encodeURIComponent(id));
     }
 
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
@@ -79,6 +79,7 @@ export default async function handler(req, res) {
     const imageTags = image ? `
 <meta property="og:image" content="${esc(image)}">
 <meta property="og:image:secure_url" content="${esc(image)}">
+<meta property="og:image:alt" content="${esc(product.name || "FMM CLASSICO product")}">
 <meta name="twitter:image" content="${esc(image)}">` : '';
     return res.status(200).send(`<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
@@ -86,7 +87,9 @@ export default async function handler(req, res) {
 <link rel="canonical" href="${esc(productUrl)}">
 <meta property="og:type" content="product"><meta property="og:site_name" content="${esc(data.brand || 'FMM CLASSICO')}">
 <meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(description)}">
-<meta property="og:url" content="${esc(productUrl)}">${imageTags}
+<meta property="og:url" content="${esc(productUrl)}">
+<meta property="product:price:amount" content="${esc(price)}"><meta property="product:price:currency" content="GHS">
+<meta property="og:locale" content="en_GH">${imageTags}
 <meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">
 <meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}">
 </head><body><main><h1>${esc(product.name || 'Phone accessory')}</h1><p>${esc(description)}</p><p>Price: GH₵ ${esc(price)}</p><p><a href="${esc(productUrl)}">View product</a></p><p><a href="${esc(orderUrl)}">Order on WhatsApp</a></p></main></body></html>`);
