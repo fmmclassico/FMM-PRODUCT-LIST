@@ -1,5 +1,5 @@
 import { list, put } from '@vercel/blob';
-import { isAdminAuthenticated } from './_auth.js';
+import { isAdminAuthenticated } from '../lib/admin-auth.js';
 const TOKEN=process.env.BLOB_READ_WRITE_TOKEN;
 const PATH='fmm-classico/catalogue.json';
 const DEFAULTS={
