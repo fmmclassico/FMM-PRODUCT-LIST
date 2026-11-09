@@ -1,0 +1,12 @@
+{
+  "name": "fmm-classico-product",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "node --check api/catalogue.js && node --check api/upload.js"
+  },
+  "dependencies": {
+    "@vercel/blob": "^2.0.0"
+  }
+}
