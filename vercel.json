@@ -1,0 +1,19 @@
+{
+  "redirects": [
+    {
+      "source": "/admin-login.html",
+      "destination": "/admin.html",
+      "permanent": true
+    },
+    {
+      "source": "/api/private-console",
+      "destination": "/admin.html",
+      "permanent": false
+    },
+    {
+      "source": "/api/login",
+      "destination": "/admin.html",
+      "permanent": false
+    }
+  ]
+}
