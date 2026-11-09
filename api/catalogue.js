@@ -1,4 +1,5 @@
 import { list, put } from '@vercel/blob';
+import { isAdminAuthenticated } from './_auth.js';
 const TOKEN=process.env.BLOB_READ_WRITE_TOKEN;
 const PATH='fmm-classico/catalogue.json';
 const DEFAULTS={
@@ -39,6 +40,7 @@ export default async function handler(req,res){
   }catch(e){console.error('catalogue GET',e);return res.status(500).json({error:'Could not load the saved catalogue.'});}
  }
  if(!['PUT','POST'].includes(req.method)){res.setHeader('Allow','GET, PUT, POST, OPTIONS');return res.status(405).json({error:'Method not allowed.'});}
+ if(!isAdminAuthenticated(req))return res.status(401).json({error:'Admin login required.'});
  if(!TOKEN)return res.status(503).json({error:'Blob storage is not connected.'});
  try{
   const value=typeof req.body==='string'?JSON.parse(req.body):req.body;
