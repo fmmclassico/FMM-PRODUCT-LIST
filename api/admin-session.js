@@ -1,5 +1,5 @@
 import { timingSafeEqual } from 'node:crypto';
-import { isAdminAuthenticated, setAdminCookie, clearAdminCookie } from './_auth.js';
+import { isAdminAuthenticated, setAdminCookie, clearAdminCookie } from '../lib/admin-auth.js';
 function equal(a,b){const x=Buffer.from(String(a||''));const y=Buffer.from(String(b||''));return x.length===y.length&&timingSafeEqual(x,y)}
 export default async function handler(req,res){
  res.setHeader('Cache-Control','no-store, max-age=0');
