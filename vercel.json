@@ -18,6 +18,10 @@
   ],
   "rewrites": [
     {
+      "source": "/FMM_CLASSICO_CUSTOMER.html",
+      "destination": "/"
+    },
+    {
       "source": "/product/:id",
       "destination": "/api/share?id=:id"
     },
