@@ -28,6 +28,10 @@
     {
       "source": "/catalogue",
       "destination": "/api/share-catalogue"
+    },
+    {
+      "source": "/:slug",
+      "destination": "/api/share?slug=:slug"
     }
   ]
 }
