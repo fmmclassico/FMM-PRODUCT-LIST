@@ -37,7 +37,11 @@ async function share(p){
  if(navigator.share){try{await navigator.share({title,text,url});$('status').textContent='Share sheet opened for '+title;return}catch(e){if(e.name==='AbortError')return}}
  window.open('https://wa.me/?text='+encodeURIComponent(text+'\n'+url),'_blank','noopener');
 }
-function bulkMessage(){\n const visible=products.filter(p=>p.visible!==false);\n return 'FMM CLASSICO | PHONE ACCESSORIES\\nYour Trusted Destination For Quality Products.\\n\\nBrowse our available products and contact us to order.\\n\\n'+visible.map((p,i)=>(i+1)+'. '+(p.name||'Product')+' — GH₵ '+(p.price||'Price on request')+'\\n'+urlFor(p)).join('\\n\\n')+'\\n\\nView the full catalogue: '+SITE+'/catalogue';\n}\nfunction render(){
+function bulkMessage(){
+ const visible=products.filter(p=>p.visible!==false);
+ return 'FMM CLASSICO | PHONE ACCESSORIES\nYour Trusted Destination For Quality Products.\n\nBrowse our available products and contact us to order.\n\n'+visible.map((p,i)=>(i+1)+'. '+(p.name||'Product')+' — GH₵ '+(p.price||'Price on request')+'\n'+urlFor(p)).join('\n\n')+'\n\nView the full catalogue: '+SITE+'/catalogue';
+}
+function render(){
  const root=$('products');root.innerHTML='';
  const visible=products.filter(p=>p.visible!==false);
  if(!visible.length){root.innerHTML='<div class="empty">No visible products are currently available to share.</div>';return}
