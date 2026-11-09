@@ -69,11 +69,6 @@ export default async function handler(req, res) {
     const orderText = 'Hello ' + (data.brand || 'FMM CLASSICO') + ', I would like to order ' + (product.name || 'this product') + '. Price: GH₵ ' + price + '.';
     const orderUrl = 'https://wa.me/' + encodeURIComponent(whatsapp) + '?text=' + encodeURIComponent(orderText);
 
-    if (!isSocialCrawler(req.headers['user-agent'] || '')) {
-      res.setHeader('Cache-Control', 'no-store');
-      return res.redirect(302, '/product.html?id=' + encodeURIComponent(id));
-    }
-
     res.setHeader('Cache-Control', 'public, max-age=60, s-maxage=300, stale-while-revalidate=600');
     res.setHeader('Content-Type', 'text/html; charset=utf-8');
     const imageTags = image ? `
@@ -92,7 +87,7 @@ export default async function handler(req, res) {
 <meta property="og:locale" content="en_GH">${imageTags}
 <meta name="twitter:card" content="${image ? 'summary_large_image' : 'summary'}">
 <meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(description)}">
-</head><body><main><h1>${esc(product.name || 'Phone accessory')}</h1><p>${esc(description)}</p><p>Price: GH₵ ${esc(price)}</p><p><a href="${esc(productUrl)}">View product</a></p><p><a href="${esc(orderUrl)}">Order on WhatsApp</a></p></main></body></html>`);
+</head><body><main><h1>${esc(product.name || 'Phone accessory')}</h1><p>${esc(description)}</p><p>Price: GH₵ ${esc(price)}</p><p><a href="/product.html?id=${encodeURIComponent(id)}">View full product details</a></p><p><a href="${esc(orderUrl)}">Order on WhatsApp</a></p></main><script>window.location.replace('/product.html?id=${encodeURIComponent(id)}');</script></body></html>`);
   } catch (error) {
     console.error('product share preview', error);
     return res.status(500).send('Could not prepare this product preview.');
