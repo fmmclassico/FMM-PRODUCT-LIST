@@ -65,7 +65,7 @@ export default async function handler(req, res) {
 
     const productSlug = slugify(product.name);
     const productUrl = SITE + '/product/' + encodeURIComponent(product.id);
-    const title = (product.name || 'Phone accessory') + ' from ' + (data.brand || 'FMM CLASSICO') + '.';
+    const title = (product.name || 'Phone accessory').trim() + ' from ' + (data.brand || 'FMM CLASSICO') + '.';
     const description = cleanDescription(product.shortDescription || product.description || 'View product details and order from FMM CLASSICO.');
     const image = getProductImage(product, data, blobs);
     const price = String(product.price || '').trim();
